@@ -1,40 +1,47 @@
 import React, { useState } from 'react';
+import bcrypt from 'bcryptjs';
 
 function Login({ onLogin }) {
     const [phone, setPhone] = useState('');
-    const [pin, setPin] = useState(['', '', '', '']); // Array to store each digit of the PIN
+    const [pin, setPin] = useState(['', '', '', '']);
+    const [error, setError] = useState('');
 
     const handlePhoneChange = (e) => {
-        const value = e.target.value.replace(/\D/g, ''); // Allow only numbers
+        const value = e.target.value.replace(/\D/g, '');
         setPhone(value);
     };
 
     const handlePinChange = (index, value) => {
         const newPin = [...pin];
-        newPin[index] = value.replace(/\D/g, ''); // Allow only numbers
+        newPin[index] = value.replace(/\D/g, '');
         setPin(newPin);
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        const fullPin = pin.join(''); // Combine the PIN digits into a single string
+        const fullPin = pin.join('');
+
         if (fullPin.length !== 4) {
-            alert('Please enter a 4-digit PIN.');
+            setError('Please enter a 4-digit PIN.');
             return;
         }
 
-        // Check if user already exists
         const users = JSON.parse(localStorage.getItem('users')) || [];
-        const user = users.find((u) => u.phone === phone && u.pin === fullPin);
+        const user = users.find((u) => u.phone === phone);
 
-        if (!user) {
-            // Create a new user if not found
-            const newUser = { phone, pin: fullPin };
+        if (user) {
+            const isMatch = await bcrypt.compare(fullPin, user.pin);
+            if (!isMatch) {
+                setError('Invalid PIN.');
+                return;
+            }
+        } else {
+            const hashedPin = await bcrypt.hash(fullPin, 10);
+            const newUser = { phone, pin: hashedPin };
             localStorage.setItem('users', JSON.stringify([...users, newUser]));
         }
 
-        // Save current user to localStorage
-        localStorage.setItem('user', JSON.stringify({ phone, pin: fullPin }));
+        localStorage.setItem('user', JSON.stringify({ phone }));
         onLogin();
     };
 
@@ -46,7 +53,7 @@ function Login({ onLogin }) {
                     type="tel"
                     value={phone}
                     onChange={handlePhoneChange}
-                    maxLength="10" // Limit to 10 digits
+                    maxLength="10"
                     required
                 />
             </div>
@@ -59,13 +66,14 @@ function Login({ onLogin }) {
                             type="text"
                             value={digit}
                             onChange={(e) => handlePinChange(index, e.target.value)}
-                            maxLength="1" // Allow only 1 digit per box
+                            maxLength="1"
                             style={{ width: '30px', textAlign: 'center' }}
                             required
                         />
                     ))}
                 </div>
             </div>
+            {error && <p style={{ color: 'red' }}>{error}</p>}
             <button type="submit">Login</button>
         </form>
     );

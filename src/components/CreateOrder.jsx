@@ -3,19 +3,18 @@ import React, { useState } from 'react';
 function CreateOrder({ onOrderCreated }) {
     const [recipientName, setRecipientName] = useState('');
     const [recipientPhone, setRecipientPhone] = useState('');
-    const user = JSON.parse(localStorage.getItem('user')); // Get logged-in user
+    const user = JSON.parse(localStorage.getItem('user'));
 
     const handleSubmit = (e) => {
         e.preventDefault();
         const newOrder = {
-            senderPhone: user.phone, // Use logged-in user's phone as sender
-            senderName: user.phone, // You can replace this with a name field if needed
+            senderPhone: user.phone,
+            senderName: user.phone,
             recipientName,
             recipientPhone,
             status: 'Preparing',
-            createdAt: new Date().toISOString(), // Store the current time
+            createdAt: new Date().toISOString(),
         };
-        // Save order to localStorage
         const savedOrders = JSON.parse(localStorage.getItem('orders')) || [];
         localStorage.setItem('orders', JSON.stringify([...savedOrders, newOrder]));
         onOrderCreated(newOrder);

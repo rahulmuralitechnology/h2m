@@ -1,41 +1,248 @@
+/* General Styles */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #121212; /* Dark background */
+  color: #e0e0e0; /* Light text */
+}
+
 .App {
-  font-family: Arial, sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  padding-bottom: 80px; /* Add padding to avoid overlap with the bottom navbar */
+}
+
+/* Bottom Navbar Styles */
+.bottom-navbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #1f1f1f; /* Dark navbar */
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 10px 0;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+}
+
+.bottom-navbar button {
+  background: none;
+  border: none;
+  color: #bb86fc; /* Purple accent */
+  font-size: 16px;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.bottom-navbar button:hover {
+  color: #7c4dff; /* Lighter purple */
+}
+
+.bottom-navbar button.active {
+  color: #7c4dff; /* Highlight active button */
+}
+
+.bottom-navbar button span {
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+/* Login Form Styles */
+form {
+  background-color: #1f1f1f; /* Dark form background */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
   max-width: 400px;
   margin: 50px auto;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 form div {
   margin-bottom: 15px;
 }
 
-label {
+form label {
   display: block;
   margin-bottom: 5px;
-  font-weight: bold;
+  font-weight: 500;
+  color: #bb86fc; /* Purple accent */
 }
 
-input {
-  width: 100%;
-  padding: 8px;
-  box-sizing: border-box;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-button {
+form input {
   width: 100%;
   padding: 10px;
-  background-color: #28a745;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+  border: 1px solid #333;
+  border-radius: 5px;
+  font-size: 14px;
+  box-sizing: border-box;
+  background-color: #333;
+  color: #e0e0e0;
+  transition: border-color 0.3s ease;
 }
 
-button:hover {
-  background-color: #218838;
+form input:focus {
+  border-color: #bb86fc; /* Purple accent */
+  outline: none;
+}
+
+form button {
+  width: 100%;
+  padding: 10px;
+  background-color: #bb86fc; /* Purple accent */
+  color: #121212; /* Dark text */
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+form button:hover {
+  background-color: #7c4dff; /* Lighter purple */
+}
+
+/* Dashboard Styles */
+.dashboard {
+  background-color: #1f1f1f; /* Dark background */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.dashboard h2 {
+  margin-top: 0;
+  color: #bb86fc; /* Purple accent */
+}
+
+.dashboard h3 {
+  color: #e0e0e0; /* Light text */
+}
+
+.order-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.order-card {
+  background-color: #333; /* Dark card background */
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.order-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.order-card p {
+  margin: 5px 0;
+  color: #e0e0e0; /* Light text */
+}
+
+.order-card button {
+  background-color: #ff4444; /* Red for cancel button */
+  color: #fff;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+.order-card button:hover {
+  background-color: #cc0000; /* Darker red */
+}
+
+/* Profile Page Styles */
+.profile {
+  background-color: #1f1f1f; /* Dark background */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  max-width: 400px;
+  margin: 50px auto;
+}
+
+.profile h2 {
+  margin-top: 0;
+  color: #bb86fc; /* Purple accent */
+}
+
+.profile label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+  color: #bb86fc; /* Purple accent */
+}
+
+.profile input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #333;
+  border-radius: 5px;
+  font-size: 14px;
+  box-sizing: border-box;
+  background-color: #333;
+  color: #e0e0e0;
+  transition: border-color 0.3s ease;
+}
+
+.profile input:focus {
+  border-color: #bb86fc; /* Purple accent */
+  outline: none;
+}
+
+.profile button {
+  width: 100%;
+  padding: 10px;
+  background-color: #bb86fc; /* Purple accent */
+  color: #121212; /* Dark text */
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.profile button:hover {
+  background-color: #7c4dff; /* Lighter purple */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .dashboard {
+    padding: 15px;
+  }
+
+  .order-list {
+    grid-template-columns: 1fr;
+  }
+
+  form,
+  .profile {
+    margin: 20px auto;
+    padding: 15px;
+  }
+
+  form input,
+  .profile input {
+    font-size: 16px; /* Larger font for mobile */
+    padding: 12px;
+  }
+
+  form button,
+  .profile button {
+    font-size: 16px; /* Larger font for mobile */
+    padding: 12px;
+  }
 }
