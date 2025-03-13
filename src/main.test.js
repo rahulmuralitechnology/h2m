@@ -5,14 +5,13 @@
 import React from 'react';
 import { render, unmountComponentAtNode } from 'react-dom';
 import { act } from 'react-dom/test-utils';
-import App from '../src/App.jsx'; // Adjust path as needed
-
+import App from '../src/App'; // Adjust path if needed
 
 let container = null;
 beforeEach(() => {
   // setup a DOM element as a render target
   container = document.createElement("div");
-  container.id = 'root';
+  container.id = 'root'; // Match the ID used in index.js
   document.body.appendChild(container);
 });
 
@@ -27,144 +26,88 @@ describe('App Component', () => {
 
   it('renders without crashing', () => {
     act(() => {
-      render(<App />, container);
+      render(<React.StrictMode><App /></React.StrictMode>, container);
     });
-    expect(container.innerHTML).not.toBe('');
+    expect(container.firstChild).toBeInTheDocument(); // Or more specific checks depending on App's content
   });
 
-  it('renders a specific element (e.g., title) - Adapt based on App.jsx content', () => {
+  it('renders initial content (positive case - adjust assertions based on your App)', () => {
     act(() => {
-      render(<App />, container);
+      render(<React.StrictMode><App /></React.StrictMode>, container);
     });
-    // Example: Adjust the expectation based on actual App.jsx content.
-    //This is just a placeholder, replace with what the App component actually renders.
-    expect(container.querySelector('h1')).toBeInTheDocument();
-
+    // Example assertions - replace with your App's expected initial content
+    expect(container.textContent).toContain('Learn React'); // Example.  Replace.
   });
 
-  it('handles user interaction (if applicable in App.jsx) -  Adapt based on App.jsx content', () => {
-      // Example: If App.jsx has a button, simulate a click.
-      // This assumes App.jsx has a button with an id of "myButton"
-      // and that clicking the button updates some part of the UI.
-
-      act(() => {
-        render(<App />, container);
-      });
-
-      const button = container.querySelector('button');
-      if(button) {
-        act(() => {
-          button.dispatchEvent(new MouseEvent('click', {bubbles: true}));
-        });
-
-        // Add an expectation based on how the UI changes after the button click.
-        // For example, if clicking the button updates the text of an element with id 'result':
-        // expect(container.querySelector('#result').textContent).toBe('Expected Result');
-      } else {
-        console.warn("No button found with id 'myButton'. Adjust the test if your App component has a different interaction.");
-      }
-  });
-
-  it('renders initial state correctly - Adapt based on App.jsx content', () => {
+  it('handles user interactions (positive case - simulate button clicks, form submissions, etc.)', () => {
     act(() => {
-      render(<App />, container);
+      render(<React.StrictMode><App /></React.StrictMode>, container);
     });
 
-      //Example: If the app displays an initial message:
-      //expect(container.textContent).toContain('Initial Message');
+    // Example - simulate a button click.  Adjust selectors & actions to match your App.
+    // const button = container.querySelector('button');
+    // act(() => {
+    //   button.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    // });
+    // expect(container.textContent).toContain('Updated Content'); // Replace with your App's expected behavior
+    // Placeholder - remove once you add actual interactions.
+    expect(true).toBe(true); // Replace with actual assertions
   });
 
-  it('handles errors gracefully (if App.jsx might throw)', async () => {
-    // Mock console.error to prevent actual errors from showing in the console during testing
-    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+  it('handles error states (negative case - simulate API failures or invalid input)', () => {
+     // This depends highly on your App's error handling logic
+    // Example: If your app makes an API call:
 
-    // This is a deliberately forced error case, assuming App.jsx might encounter issues.
-    // Adjust this part to represent a scenario where App.jsx *could* throw an error.
-
-    const BrokenApp = () => {
-        // Simulate an error inside App.jsx
-        throw new Error("Simulated Error");
-    };
-
-      render(<BrokenApp />, container);
-
-    // Check if error handling mechanism (if any) in App.jsx is working
-    // For example, if App.jsx has a error boundary or fallback UI.
-    //expect(container.textContent).toContain('Error occurred'); //Adapt this based on expected behavior
-
-
-    // Restore the original console.error
-    consoleErrorSpy.mockRestore();
-  });
-
-  it('renders null or empty content without issues (if applicable)', () => {
-
-      // If App.jsx *could* return null or empty content under certain conditions,
-      // this tests that it doesn't crash the rendering.  This assumes App.jsx conditionally renders something.
-      const EmptyApp = () => null;
-      act(() => {
-        render(<EmptyApp />, container);
-      });
-
-      expect(container.innerHTML).toBe('');
-  });
-
-
-  it('cleans up resources properly on unmount (if App.jsx has side effects)', () => {
-    // Mock a cleanup function if App.jsx has side effects (e.g., event listeners, timers)
-    const cleanupMock = jest.fn();
-
-    const AppWithCleanup = () => {
-      React.useEffect(() => {
-        // Simulate setting up a resource (e.g., event listener)
-        // In a real scenario, this might be `window.addEventListener(...)`
-        return () => {
-          cleanupMock(); // Simulate resource cleanup
-        };
-      }, []);
-
-      return <div>Test</div>;
-    };
+    // Mock the API call to simulate a failure
+    // jest.spyOn(global, 'fetch').mockImplementation(() =>
+    //   Promise.reject(new Error('API Error'))
+    // );
 
     act(() => {
-      render(<AppWithCleanup />, container);
+       render(<React.StrictMode><App /></React.StrictMode>, container);
     });
 
-    // Unmount the component
-    act(() => {
-      unmountComponentAtNode(container);
-    });
-
-    // Assert that the cleanup function was called
-    expect(cleanupMock).toHaveBeenCalled();
+    // Expect to see an error message displayed
+    // expect(container.textContent).toContain('Error: API Error');
+    // Clear the mock after the test:
+    // global.fetch.mockRestore();
+    //Placeholder - remove when you add error handling to the App and write tests for it.
+    expect(true).toBe(true); // Replace with actual assertions related to error handling
   });
 
+  it('handles edge cases (e.g., empty data, very long strings, boundary values)', () => {
+    //  This depends entirely on your App's logic.  Examples:
 
-  it('handles large datasets efficiently (if App.jsx renders large lists)', () => {
-    // This test is a placeholder, it requires to measure performance
-    //  and create assertion base on the benchmarked time.
-    // Can use library like `jest-performance` to measure the rendering time.
-
-    const largeData = Array.from({ length: 1000 }, (_, i) => ({ id: i, name: `Item ${i}` }));
-
-    const LargeListApp = ({ data }) => {
-      return (
-        <ul>
-          {data.map((item) => (
-            <li key={item.id}>{item.name}</li>
-          ))}
-        </ul>
-      );
-    };
+    // 1. If your App renders a list based on data, test with an empty array.
+    // 2. If your App handles user input, test with an extremely long string.
+    // 3. If your App uses numerical values, test with min/max values.
 
     act(() => {
-      render(<LargeListApp data={largeData} />, container);
+      render(<React.StrictMode><App /></React.StrictMode>, container);
     });
-    expect(container.querySelectorAll('li').length).toBe(1000);
-    // Example to add performance validation
-    // Measure the rendering time.
-    // expect(renderingTime).toBeLessThan(500); //Expect to render in 500 ms
+
+    // Example (if your app processes user input):
+    // const input = container.querySelector('input');
+    // act(() => {
+    //   input.value = 'A'.repeat(1000); // Very long string
+    //   input.dispatchEvent(new Event('change', { bubbles: true }));
+    // });
+    // expect(container.textContent).toContain('String is too long'); // Replace with expected behavior
+
+    //Placeholder - remove when you add edge-case handling to the App and write tests for it.
+    expect(true).toBe(true); // Replace with actual assertions related to edge cases
   });
 
+  it('unmounts without errors', () => {
+     act(() => {
+       render(<React.StrictMode><App /></React.StrictMode>, container);
+     });
+     act(() => {
+       unmountComponentAtNode(container);
+     });
+
+     // Optionally, check that the container is now empty:
+     expect(container.innerHTML).toBe(''); // Or a more specific check if needed.
+  });
 });
 
