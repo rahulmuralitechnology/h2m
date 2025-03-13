@@ -6,154 +6,128 @@ describe('CreateOrder Component', () => {
   const mockOnOrderCreated = jest.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
     localStorage.clear();
-    // Mock user data in localStorage
-    localStorage.setItem('user', JSON.stringify({ phone: '123-456-7890', name: 'Test User' }));
+    mockOnOrderCreated.mockClear();
+    localStorage.setItem('user', JSON.stringify({ phone: '1234567890' }));
   });
 
-  it('renders the form with input fields and a submit button', () => {
+  it('renders the component correctly', () => {
     render(<CreateOrder onOrderCreated={mockOnOrderCreated} />);
     expect(screen.getByLabelText("Recipient's Name:")).toBeInTheDocument();
     expect(screen.getByLabelText("Recipient's Phone:")).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Create Order' })).toBeInTheDocument();
   });
 
-  it('updates recipient name and phone state when input values change', () => {
+  it('creates an order with valid input', () => {
     render(<CreateOrder onOrderCreated={mockOnOrderCreated} />);
-    const nameInput = screen.getByLabelText("Recipient's Name:");
-    const phoneInput = screen.getByLabelText("Recipient's Phone:");
+    const recipientNameInput = screen.getByLabelText("Recipient's Name:");
+    const recipientPhoneInput = screen.getByLabelText("Recipient's Phone:");
+    const createOrderButton = screen.getByRole('button', { name: 'Create Order' });
 
-    fireEvent.change(nameInput, { target: { value: 'John Doe' } });
-    fireEvent.change(phoneInput, { target: { value: '987-654-3210' } });
-
-    expect(nameInput.value).toBe('John Doe');
-    expect(phoneInput.value).toBe('987-654-3210');
-  });
-
-  it('calls onOrderCreated with the correct order details when the form is submitted (positive case)', () => {
-    render(<CreateOrder onOrderCreated={mockOnOrderCreated} />);
-    const nameInput = screen.getByLabelText("Recipient's Name:");
-    const phoneInput = screen.getByLabelText("Recipient's Phone:");
-    const submitButton = screen.getByRole('button', { name: 'Create Order' });
-
-    fireEvent.change(nameInput, { target: { value: 'Jane Doe' } });
-    fireEvent.change(phoneInput, { target: { value: '555-123-4567' } });
-    fireEvent.click(submitButton);
+    fireEvent.change(recipientNameInput, { target: { value: 'John Doe' } });
+    fireEvent.change(recipientPhoneInput, { target: { value: '9876543210' } });
+    fireEvent.click(createOrderButton);
 
     expect(mockOnOrderCreated).toHaveBeenCalledTimes(1);
     const order = mockOnOrderCreated.mock.calls[0][0];
-    expect(order).toEqual(expect.objectContaining({
-      senderPhone: '123-456-7890',
-      senderName: '123-456-7890',
-      recipientName: 'Jane Doe',
-      recipientPhone: '555-123-4567',
-      status: 'Preparing',
-    }));
+    expect(order.recipientName).toBe('John Doe');
+    expect(order.recipientPhone).toBe('9876543210');
+    expect(order.senderPhone).toBe('1234567890');
+    expect(order.senderName).toBe('1234567890');
+    expect(order.status).toBe('Preparing');
     expect(order.createdAt).toBeDefined();
+
+    const storedOrders = JSON.parse(localStorage.getItem('orders'));
+    expect(storedOrders).toHaveLength(1);
+    expect(storedOrders[0]).toEqual(order);
+
   });
 
-  it('saves the order to localStorage when the form is submitted', () => {
+  it('creates an order when localStorage is empty', () => {
+    localStorage.removeItem('orders');
     render(<CreateOrder onOrderCreated={mockOnOrderCreated} />);
-    const nameInput = screen.getByLabelText("Recipient's Name:");
-    const phoneInput = screen.getByLabelText("Recipient's Phone:");
-    const submitButton = screen.getByRole('button', { name: 'Create Order' });
+    const recipientNameInput = screen.getByLabelText("Recipient's Name:");
+    const recipientPhoneInput = screen.getByLabelText("Recipient's Phone:");
+    const createOrderButton = screen.getByRole('button', { name: 'Create Order' });
 
-    fireEvent.change(nameInput, { target: { value: 'Jane Doe' } });
-    fireEvent.change(phoneInput, { target: { value: '555-123-4567' } });
-    fireEvent.click(submitButton);
+    fireEvent.change(recipientNameInput, { target: { value: 'Jane Doe' } });
+    fireEvent.change(recipientPhoneInput, { target: { value: '1122334455' } });
+    fireEvent.click(createOrderButton);
 
-    const savedOrders = JSON.parse(localStorage.getItem('orders'));
-    expect(savedOrders).toHaveLength(1);
-    expect(savedOrders[0]).toEqual(expect.objectContaining({
-        senderPhone: '123-456-7890',
-        senderName: '123-456-7890',
-        recipientName: 'Jane Doe',
-        recipientPhone: '555-123-4567',
-        status: 'Preparing',
-    }));
+    expect(mockOnOrderCreated).toHaveBeenCalledTimes(1);
+    const order = mockOnOrderCreated.mock.calls[0][0];
+
+    const storedOrders = JSON.parse(localStorage.getItem('orders'));
+    expect(storedOrders).toHaveLength(1);
+    expect(storedOrders[0]).toEqual(order);
   });
 
-  it('adds to existing orders in localStorage (edge case)', () => {
-    const initialOrders = [{ recipientName: 'Old Order', recipientPhone: '111-222-3333', senderPhone: '123-456-7890', senderName: '123-456-7890', status: 'Preparing', createdAt: new Date().toISOString()}];
+  it('adds to existing orders in local storage', () => {
+    const initialOrders = [{ recipientName: 'Old Order', recipientPhone: '0000000000' }];
     localStorage.setItem('orders', JSON.stringify(initialOrders));
-
     render(<CreateOrder onOrderCreated={mockOnOrderCreated} />);
-    const nameInput = screen.getByLabelText("Recipient's Name:");
-    const phoneInput = screen.getByLabelText("Recipient's Phone:");
-    const submitButton = screen.getByRole('button', { name: 'Create Order' });
+    const recipientNameInput = screen.getByLabelText("Recipient's Name:");
+    const recipientPhoneInput = screen.getByLabelText("Recipient's Phone:");
+    const createOrderButton = screen.getByRole('button', { name: 'Create Order' });
 
-    fireEvent.change(nameInput, { target: { value: 'Jane Doe' } });
-    fireEvent.change(phoneInput, { target: { value: '555-123-4567' } });
-    fireEvent.click(submitButton);
+    fireEvent.change(recipientNameInput, { target: { value: 'New Order' } });
+    fireEvent.change(recipientPhoneInput, { target: { value: '9999999999' } });
+    fireEvent.click(createOrderButton);
 
-    const savedOrders = JSON.parse(localStorage.getItem('orders'));
-    expect(savedOrders).toHaveLength(2);
-    expect(savedOrders[1]).toEqual(expect.objectContaining({
-        senderPhone: '123-456-7890',
-        senderName: '123-456-7890',
-        recipientName: 'Jane Doe',
-        recipientPhone: '555-123-4567',
-        status: 'Preparing',
-    }));
-    expect(savedOrders[0]).toEqual(expect.objectContaining({recipientName: 'Old Order', recipientPhone: '111-222-3333'}));
+    expect(mockOnOrderCreated).toHaveBeenCalledTimes(1);
+    const order = mockOnOrderCreated.mock.calls[0][0];
+
+    const storedOrders = JSON.parse(localStorage.getItem('orders'));
+    expect(storedOrders).toHaveLength(2);
+    expect(storedOrders[1]).toEqual(order);
+    expect(storedOrders[0].recipientName).toBe('Old Order');
   });
 
-  it('does not call onOrderCreated if required fields are empty (negative case - missing name)', () => {
-        render(<CreateOrder onOrderCreated={mockOnOrderCreated} />);
-        const phoneInput = screen.getByLabelText("Recipient's Phone:");
-        const submitButton = screen.getByRole('button', { name: 'Create Order' });
+  it('does not create an order if recipient name is empty', () => {
+    render(<CreateOrder onOrderCreated={mockOnOrderCreated} />);
+    const recipientPhoneInput = screen.getByLabelText("Recipient's Phone:");
+    const createOrderButton = screen.getByRole('button', { name: 'Create Order' });
 
-        fireEvent.change(phoneInput, { target: { value: '555-123-4567' } });
-        fireEvent.click(submitButton);
+    fireEvent.change(recipientPhoneInput, { target: { value: '9876543210' } });
+    fireEvent.click(createOrderButton);
 
-        expect(mockOnOrderCreated).not.toHaveBeenCalled();
+    expect(mockOnOrderCreated).not.toHaveBeenCalled();
+    expect(localStorage.getItem('orders')).toBeNull();
   });
 
-    it('does not call onOrderCreated if required fields are empty (negative case - missing phone)', () => {
-        render(<CreateOrder onOrderCreated={mockOnOrderCreated} />);
-        const nameInput = screen.getByLabelText("Recipient's Name:");
-        const submitButton = screen.getByRole('button', { name: 'Create Order' });
+    it('does not create an order if recipient phone is empty', () => {
+    render(<CreateOrder onOrderCreated={mockOnOrderCreated} />);
+    const recipientNameInput = screen.getByLabelText("Recipient's Name:");
+    const createOrderButton = screen.getByRole('button', { name: 'Create Order' });
 
-        fireEvent.change(nameInput, { target: { value: 'Jane Doe' } });
-        fireEvent.click(submitButton);
+    fireEvent.change(recipientNameInput, { target: { value: 'John Doe' } });
+    fireEvent.click(createOrderButton);
 
-        expect(mockOnOrderCreated).not.toHaveBeenCalled();
-    });
+    expect(mockOnOrderCreated).not.toHaveBeenCalled();
+    expect(localStorage.getItem('orders')).toBeNull();
+  });
 
-  it('handles empty localStorage orders gracefully (edge case)', () => {
-      localStorage.removeItem('orders');
-      render(<CreateOrder onOrderCreated={mockOnOrderCreated} />);
-      const nameInput = screen.getByLabelText("Recipient's Name:");
-      const phoneInput = screen.getByLabelText("Recipient's Phone:");
-      const submitButton = screen.getByRole('button', { name: 'Create Order' });
+  it('handles edge case: very long recipient name and phone', () => {
+    render(<CreateOrder onOrderCreated={mockOnOrderCreated} />);
+    const recipientNameInput = screen.getByLabelText("Recipient's Name:");
+    const recipientPhoneInput = screen.getByLabelText("Recipient's Phone:");
+    const createOrderButton = screen.getByRole('button', { name: 'Create Order' });
 
-      fireEvent.change(nameInput, { target: { value: 'Jane Doe' } });
-      fireEvent.change(phoneInput, { target: { value: '555-123-4567' } });
-      fireEvent.click(submitButton);
+    const longName = 'a'.repeat(200);
+    const longPhone = '1'.repeat(200);
 
-      const savedOrders = JSON.parse(localStorage.getItem('orders'));
-      expect(savedOrders).toHaveLength(1);
-    });
+    fireEvent.change(recipientNameInput, { target: { value: longName } });
+    fireEvent.change(recipientPhoneInput, { target: { value: longPhone } });
+    fireEvent.click(createOrderButton);
 
-    it('handles missing user data in localStorage', () => {
-        localStorage.removeItem('user');
-        const { rerender } = render(<CreateOrder onOrderCreated={mockOnOrderCreated} />);
-        const nameInput = screen.getByLabelText("Recipient's Name:");
-        const phoneInput = screen.getByLabelText("Recipient's Phone:");
-        const submitButton = screen.getByRole('button', { name: 'Create Order' });
+    expect(mockOnOrderCreated).toHaveBeenCalledTimes(1);
+    const order = mockOnOrderCreated.mock.calls[0][0];
+    expect(order.recipientName).toBe(longName);
+    expect(order.recipientPhone).toBe(longPhone);
 
-        fireEvent.change(nameInput, { target: { value: 'Jane Doe' } });
-        fireEvent.change(phoneInput, { target: { value: '555-123-4567' } });
-        fireEvent.click(submitButton);
-        expect(mockOnOrderCreated).toHaveBeenCalledTimes(1);
-
-        const order = mockOnOrderCreated.mock.calls[0][0];
-        expect(order).toEqual(expect.objectContaining({
-            recipientName: 'Jane Doe',
-            recipientPhone: '555-123-4567',
-            status: 'Preparing',
-        }));
-    });
+    const storedOrders = JSON.parse(localStorage.getItem('orders'));
+    expect(storedOrders).toHaveLength(1);
+    expect(storedOrders[0]).toEqual(order);
+  });
 });
 
