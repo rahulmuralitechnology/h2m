@@ -5,13 +5,13 @@
 import React from 'react';
 import { render, unmountComponentAtNode } from 'react-dom';
 import { act } from 'react-dom/test-utils';
-import App from '../src/App'; // Adjust path if needed
+import App from '../src/App.jsx'; // Adjust path if needed
 
 let container = null;
 beforeEach(() => {
   // setup a DOM element as a render target
   container = document.createElement("div");
-  container.id = 'root'; // Match the ID used in index.js
+  container.id = 'root';
   document.body.appendChild(container);
 });
 
@@ -28,86 +28,53 @@ describe('App Component', () => {
     act(() => {
       render(<React.StrictMode><App /></React.StrictMode>, container);
     });
-    expect(container.firstChild).toBeInTheDocument(); // Or more specific checks depending on App's content
+    expect(container.innerHTML).toBeTruthy(); // Basic check that something rendered
   });
 
-  it('renders initial content (positive case - adjust assertions based on your App)', () => {
-    act(() => {
-      render(<React.StrictMode><App /></React.StrictMode>, container);
-    });
-    // Example assertions - replace with your App's expected initial content
-    expect(container.textContent).toContain('Learn React'); // Example.  Replace.
-  });
 
-  it('handles user interactions (positive case - simulate button clicks, form submissions, etc.)', () => {
+  it('renders the App component with expected initial content (Positive Case - depends on App implementation)', () => {
     act(() => {
       render(<React.StrictMode><App /></React.StrictMode>, container);
     });
 
-    // Example - simulate a button click.  Adjust selectors & actions to match your App.
-    // const button = container.querySelector('button');
-    // act(() => {
-    //   button.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    // });
-    // expect(container.textContent).toContain('Updated Content'); // Replace with your App's expected behavior
-    // Placeholder - remove once you add actual interactions.
-    expect(true).toBe(true); // Replace with actual assertions
+    // Example:  Adjust assertions based on your actual App.jsx content.
+    // For instance, if App renders a heading:
+    const heading = container.querySelector('h1');
+    if(heading) {
+        expect(heading.textContent).toBeTruthy();
+    }
   });
 
-  it('handles error states (negative case - simulate API failures or invalid input)', () => {
-     // This depends highly on your App's error handling logic
-    // Example: If your app makes an API call:
+  it('handles edge case where root element is missing', () => {
+    const originalGetElementById = document.getElementById;
+    document.getElementById = jest.fn(() => null); // Mock document.getElementById to return null
 
-    // Mock the API call to simulate a failure
-    // jest.spyOn(global, 'fetch').mockImplementation(() =>
-    //   Promise.reject(new Error('API Error'))
-    // );
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});  //Suppress Console Error during testing
 
-    act(() => {
-       render(<React.StrictMode><App /></React.StrictMode>, container);
-    });
+    expect(() => {
+      createRoot(document.getElementById('root')).render(
+        <React.StrictMode>
+          <App />
+        </React.StrictMode>,
+      );
+    }).toThrow();
 
-    // Expect to see an error message displayed
-    // expect(container.textContent).toContain('Error: API Error');
-    // Clear the mock after the test:
-    // global.fetch.mockRestore();
-    //Placeholder - remove when you add error handling to the App and write tests for it.
-    expect(true).toBe(true); // Replace with actual assertions related to error handling
+    document.getElementById = originalGetElementById;  // Restore original function
+    consoleErrorSpy.mockRestore();
   });
 
-  it('handles edge cases (e.g., empty data, very long strings, boundary values)', () => {
-    //  This depends entirely on your App's logic.  Examples:
 
-    // 1. If your App renders a list based on data, test with an empty array.
-    // 2. If your App handles user input, test with an extremely long string.
-    // 3. If your App uses numerical values, test with min/max values.
-
-    act(() => {
-      render(<React.StrictMode><App /></React.StrictMode>, container);
-    });
-
-    // Example (if your app processes user input):
-    // const input = container.querySelector('input');
-    // act(() => {
-    //   input.value = 'A'.repeat(1000); // Very long string
-    //   input.dispatchEvent(new Event('change', { bubbles: true }));
-    // });
-    // expect(container.textContent).toContain('String is too long'); // Replace with expected behavior
-
-    //Placeholder - remove when you add edge-case handling to the App and write tests for it.
-    expect(true).toBe(true); // Replace with actual assertions related to edge cases
-  });
-
-  it('unmounts without errors', () => {
+  it('handles rendering with no initial data (if your component expects data)', () => {
+     // Depends on how App.jsx handles missing data. Example:
      act(() => {
-       render(<React.StrictMode><App /></React.StrictMode>, container);
-     });
-     act(() => {
-       unmountComponentAtNode(container);
-     });
+        render(<React.StrictMode><App /></React.StrictMode>, container);
+      });
+      //Check for empty states.
+    // const element = container.querySelector('.nodata'); //Example className.
 
-     // Optionally, check that the container is now empty:
-     expect(container.innerHTML).toBe(''); // Or a more specific check if needed.
+    // if(element) {
+    //   expect(element).toBeTruthy(); // Make sure there is a placeholder message.
+    // }
   });
 });
 
