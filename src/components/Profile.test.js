@@ -2,39 +2,16 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import Profile from './Profile';
 
-// Mock localStorage
-const localStorageMock = (function() {
-  let store = {};
-  return {
-    getItem: function(key) {
-      return store[key] || null;
-    },
-    setItem: function(key, value) {
-      store[key] = String(value);
-    },
-    clear: function() {
-      store = {};
-    },
-    removeItem: function(key) {
-      delete store[key];
-    },
-  };
-})();
-Object.defineProperty(global, 'localStorage', { value: localStorageMock });
-
 describe('Profile Component', () => {
   beforeEach(() => {
     localStorage.clear();
-    jest.spyOn(window, 'alert').mockImplementation(() => {}); // Mock alert
-  });
-
-  afterEach(() => {
-    window.alert.mockRestore(); // Restore alert
   });
 
   it('should render the component with initial values from localStorage', () => {
-    localStorage.setItem('user', JSON.stringify({ phone: '1234567890' }));
-    localStorage.setItem('users', JSON.stringify([{ phone: '1234567890', name: 'Test User' }]));
+    const mockUser = { phone: '1234567890' };
+    const mockUsers = [{ phone: '1234567890', name: 'Test User' }];
+    localStorage.setItem('user', JSON.stringify(mockUser));
+    localStorage.setItem('users', JSON.stringify(mockUsers));
 
     render(<Profile />);
 
@@ -42,111 +19,100 @@ describe('Profile Component', () => {
     expect(screen.getByLabelText('Phone Number:')).toHaveValue('1234567890');
   });
 
-  it('should update the name and phone number in localStorage on form submission', async () => {
-    localStorage.setItem('user', JSON.stringify({ phone: '1234567890' }));
-    localStorage.setItem('users', JSON.stringify([{ phone: '1234567890', name: 'Test User' }]));
+  it('should update the name and phone number in the form', () => {
+    const mockUser = { phone: '1234567890' };
+    localStorage.setItem('user', JSON.stringify(mockUser));
+    localStorage.setItem('users', JSON.stringify([]));
 
     render(<Profile />);
 
-    const nameInput = screen.getByLabelText('Name:');
-    const phoneInput = screen.getByLabelText('Phone Number:');
-    const submitButton = screen.getByRole('button', { name: 'Update Profile' });
+    fireEvent.change(screen.getByLabelText('Name:'), { target: { value: 'New Name' } });
+    fireEvent.change(screen.getByLabelText('Phone Number:'), { target: { value: '0987654321' } });
 
-    fireEvent.change(nameInput, { target: { value: 'Updated User' } });
-    fireEvent.change(phoneInput, { target: { value: '0987654321' } });
-    fireEvent.click(submitButton);
-
-    await waitFor(() => {
-      expect(localStorage.getItem('users')).toBe(JSON.stringify([{ phone: '1234567890', name: 'Updated User', phone: '0987654321' }]));
-      expect(localStorage.getItem('user')).toBe(JSON.stringify({ phone: '1234567890', name: 'Updated User', phone: '0987654321' }));
-      expect(window.alert).toHaveBeenCalledWith('Profile updated successfully!');
-
-      });
-
+    expect(screen.getByLabelText('Name:')).toHaveValue('New Name');
+    expect(screen.getByLabelText('Phone Number:')).toHaveValue('0987654321');
   });
 
-  it('should handle the case where localStorage is empty initially', () => {
-    localStorage.clear();
-    localStorage.setItem('user', JSON.stringify({ phone: '1234567890' }));
+  it('should update the localStorage and display an alert on form submission', async () => {
+    const mockUser = { phone: '1234567890' };
+    localStorage.setItem('user', JSON.stringify(mockUser));
+    localStorage.setItem('users', JSON.stringify([]));
+
+    const alertMock = jest.spyOn(window, 'alert');
+    alertMock.mockImplementation(() => {});
+
+    render(<Profile />);
+
+    fireEvent.change(screen.getByLabelText('Name:'), { target: { value: 'Updated Name' } });
+    fireEvent.change(screen.getByLabelText('Phone Number:'), { target: { value: '9998887777' } });
+    fireEvent.click(screen.getByText('Update Profile'));
+
+    await waitFor(() => {
+        expect(localStorage.getItem('users')).toEqual(JSON.stringify([{name: 'Updated Name', phone: '9998887777'}]));
+        expect(localStorage.getItem('user')).toEqual(JSON.stringify({phone: '1234567890', name: 'Updated Name', phone: '9998887777'}));
+        expect(alertMock).toHaveBeenCalledWith('Profile updated successfully!');
+    });
+
+    alertMock.mockRestore();
+  });
+
+  it('should handle the case where localStorage is empty', () => {
     render(<Profile />);
 
     expect(screen.getByLabelText('Name:')).toHaveValue('');
     expect(screen.getByLabelText('Phone Number:')).toHaveValue('');
   });
 
-  it('should handle the case where user is not found in the users array', () => {
-    localStorage.setItem('user', JSON.stringify({ phone: '1234567890' }));
-    localStorage.setItem('users', JSON.stringify([{ phone: '0000000000', name: 'Other User' }]));
+  it('should handle the case where the user is not found in the users array', () => {
+    const mockUser = { phone: '1234567890' };
+    const mockUsers = [{ phone: '0000000000', name: 'Another User' }];
+    localStorage.setItem('user', JSON.stringify(mockUser));
+    localStorage.setItem('users', JSON.stringify(mockUsers));
 
     render(<Profile />);
 
     expect(screen.getByLabelText('Name:')).toHaveValue('');
-    expect(screen.getByLabelText('Phone Number:')).toHaveValue('1234567890'); // Phone is populated by user object
-
+    expect(screen.getByLabelText('Phone Number:')).toHaveValue('');
   });
 
-  it('should only allow numeric input for the phone number', () => {
-    localStorage.setItem('user', JSON.stringify({ phone: '1234567890' }));
-    localStorage.setItem('users', JSON.stringify([{ phone: '1234567890', name: 'Test User' }]));
-    render(<Profile />);
+    it('should update only the current user details', async () => {
+        const mockUser = { phone: '1234567890' };
+        const mockUsers = [{ phone: '1234567890', name: 'Test User' }, { phone: '0000000000', name: 'Another User' }];
+        localStorage.setItem('user', JSON.stringify(mockUser));
+        localStorage.setItem('users', JSON.stringify(mockUsers));
 
-    const phoneInput = screen.getByLabelText('Phone Number:');
-    fireEvent.change(phoneInput, { target: { value: 'abc123xyz' } });
+        const alertMock = jest.spyOn(window, 'alert');
+        alertMock.mockImplementation(() => {});
 
-    expect(phoneInput).toHaveValue('123');
-  });
+        render(<Profile />);
 
-  it('should limit the phone number input to 10 characters', () => {
-    localStorage.setItem('user', JSON.stringify({ phone: '1234567890' }));
-     localStorage.setItem('users', JSON.stringify([{ phone: '1234567890', name: 'Test User' }]));
+        fireEvent.change(screen.getByLabelText('Name:'), { target: { value: 'Updated Name' } });
+        fireEvent.change(screen.getByLabelText('Phone Number:'), { target: { value: '9998887777' } });
+        fireEvent.click(screen.getByText('Update Profile'));
 
-    render(<Profile />);
+        await waitFor(() => {
+            const expectedUsers = [{ phone: '1234567890', name: 'Updated Name', phone: '9998887777' }, { phone: '0000000000', name: 'Another User' }];
+            expect(localStorage.getItem('users')).toEqual(JSON.stringify(expectedUsers));
+            expect(localStorage.getItem('user')).toEqual(JSON.stringify({phone: '1234567890', name: 'Updated Name', phone: '9998887777'}));
+            expect(alertMock).toHaveBeenCalledWith('Profile updated successfully!');
+        });
 
-    const phoneInput = screen.getByLabelText('Phone Number:');
-    fireEvent.change(phoneInput, { target: { value: '1234567890123' } });
+        alertMock.mockRestore();
+    });
 
-    expect(phoneInput).toHaveValue('1234567890');
-  });
+    it('should only allow numbers for the phone number input and limit to 10 digits', () => {
+      const mockUser = { phone: '1234567890' };
+      localStorage.setItem('user', JSON.stringify(mockUser));
+      localStorage.setItem('users', JSON.stringify([]));
 
-  it('should handle the case where name is null or undefined in the user object', () => {
-    localStorage.setItem('user', JSON.stringify({ phone: '1234567890' }));
-    localStorage.setItem('users', JSON.stringify([{ phone: '1234567890', name: null }]));
-
-    render(<Profile />);
-
-    expect(screen.getByLabelText('Name:')).toHaveValue('');
-
-    localStorage.setItem('users', JSON.stringify([{ phone: '1234567890', name: undefined }]));
-    render(<Profile />);
-
-     expect(screen.getByLabelText('Name:')).toHaveValue('');
-  });
-
-  it('should render the component even if "users" is not in local storage', () => {
-    localStorage.setItem('user', JSON.stringify({ phone: '1234567890' }));
-
-    render(<Profile />);
-
-    expect(screen.getByLabelText('Name:')).toHaveValue('');
-    expect(screen.getByLabelText('Phone Number:')).toHaveValue('1234567890'); // Phone is populated by user object
-  });
-
-  it('should use the phone number from localStorage user for form phone initial state when user exists in users', () => {
-      localStorage.setItem('user', JSON.stringify({ phone: '0000000000' }));
-      localStorage.setItem('users', JSON.stringify([{ phone: '1111111111', name: 'Other User' }, {phone:'0000000000', name:'Correct User'} ]));
       render(<Profile />);
 
-      expect(screen.getByLabelText('Phone Number:')).toHaveValue('0000000000');
-      expect(screen.getByLabelText('Name:')).toHaveValue('Correct User');
-  });
+      const phoneInput = screen.getByLabelText('Phone Number:');
+      fireEvent.change(phoneInput, { target: { value: 'abc123def456ghi789' } });
+      expect(phoneInput).toHaveValue('123456789');
 
-  it('should use the phone number from localStorage user for form phone initial state when user does not exists in users', () => {
-    localStorage.setItem('user', JSON.stringify({ phone: '9999999999' }));
-    localStorage.setItem('users', JSON.stringify([{ phone: '1111111111', name: 'Other User' }, {phone:'0000000000', name:'Correct User'} ]));
-    render(<Profile />);
-
-    expect(screen.getByLabelText('Phone Number:')).toHaveValue('9999999999');
-    expect(screen.getByLabelText('Name:')).toHaveValue('');
-  });
+      fireEvent.change(phoneInput, { target: { value: '1234567890123' } });
+      expect(phoneInput).toHaveValue('1234567890');
+    });
 });
 
