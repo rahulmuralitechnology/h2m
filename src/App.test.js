@@ -1,15 +1,17 @@
 import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import '@testing-library/jest-dom';
 import App from './App';
+import Login from './components/Login';
+import Dashboard from './components/Dashboard';
+import Navbar from './components/Navbar';
+import Profile from './components/Profile';
 
-// Mock the components used in App to isolate testing to App's logic
 jest.mock('./components/Login', () => {
   return function MockLogin(props) {
     return (
       <div>
         Mock Login Component
-        <button onClick={props.onLogin}>Login</button>
+        <button onClick={props.onLogin}>Mock Login Button</button>
       </div>
     );
   };
@@ -26,9 +28,9 @@ jest.mock('./components/Navbar', () => {
     return (
       <div>
         Mock Navbar Component
-        <button onClick={props.onLogout}>Logout</button>
-        <button onClick={() => props.navigateTo('dashboard')}>Dashboard</button>
-        <button onClick={() => props.navigateTo('profile')}>Profile</button>
+        {props.isLoggedIn && <button onClick={props.onLogout}>Mock Logout Button</button>}
+        <button onClick={() => props.navigateTo('dashboard')}>Mock Dashboard Nav</button>
+        <button onClick={() => props.navigateTo('profile')}>Mock Profile Nav</button>
         <div>Current Page: {props.currentPage}</div>
       </div>
     );
@@ -44,76 +46,87 @@ jest.mock('./components/Profile', () => {
 describe('App Component', () => {
   beforeEach(() => {
     localStorage.clear();
-    jest.clearAllMocks();
   });
 
   it('renders loading state initially', () => {
-    const { getByText } = render(<App />);
-    expect(getByText('Loading...')).toBeInTheDocument();
+    render(<App />);
+    expect(screen.getByText('Loading...')).toBeInTheDocument();
   });
 
-  it('renders Login component when not logged in after loading', async () => {
+  it('renders Login component when not logged in', async () => {
     render(<App />);
-    await waitFor(() => screen.getByText('Mock Login Component'));
-    expect(screen.getByText('Mock Login Component')).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText('Mock Login Component')).toBeInTheDocument());
   });
 
-  it('renders Dashboard and Navbar components when logged in after loading and navigates to Dashboard', async () => {
-    localStorage.setItem('user', JSON.stringify({ name: 'Test User' }));
+  it('renders Dashboard component when logged in and on dashboard page', async () => {
+    localStorage.setItem('user', JSON.stringify({ username: 'testuser' }));
     render(<App />);
-    await waitFor(() => screen.getByText('Mock Dashboard Component'));
+    await waitFor(() => expect(screen.getByText('Mock Dashboard Component')).toBeInTheDocument());
+  });
+
+  it('renders Profile component when logged in and on profile page', async () => {
+    localStorage.setItem('user', JSON.stringify({ username: 'testuser' }));
+    render(<App />);
+    const { getByText } = screen;
+    await waitFor(() => {
+      fireEvent.click(getByText('Mock Profile Nav'));
+      expect(getByText('Mock Profile Component')).toBeInTheDocument()
+    });
+  });
+
+  it('handles login correctly', async () => {
+    render(<App />);
+    await waitFor(() => expect(screen.getByText('Mock Login Component')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('Mock Login Button'));
+    await waitFor(() => expect(screen.getByText('Mock Dashboard Component')).toBeInTheDocument());
+  });
+
+  it('handles logout correctly', async () => {
+    localStorage.setItem('user', JSON.stringify({ username: 'testuser' }));
+    render(<App />);
+    await waitFor(() => expect(screen.getByText('Mock Dashboard Component')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('Mock Logout Button'));
+    await waitFor(() => expect(screen.getByText('Mock Login Component')).toBeInTheDocument());
+    expect(localStorage.getItem('user')).toBeNull();
+  });
+
+  it('navigates to dashboard page correctly', async () => {
+    localStorage.setItem('user', JSON.stringify({ username: 'testuser' }));
+    render(<App />);
+    await waitFor(() => expect(screen.getByText('Mock Dashboard Component')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText('Mock Dashboard Nav'));
+    await waitFor(() => expect(screen.getByText('Current Page: dashboard')).toBeInTheDocument());
 
     expect(screen.getByText('Mock Dashboard Component')).toBeInTheDocument();
-    expect(screen.getByText('Mock Navbar Component')).toBeInTheDocument();
-    expect(screen.getByText('Current Page: dashboard')).toBeInTheDocument();
   });
 
-  it('renders Profile component when logged in and navigates to Profile', async () => {
-    localStorage.setItem('user', JSON.stringify({ name: 'Test User' }));
+  it('navigates to profile page correctly', async () => {
+    localStorage.setItem('user', JSON.stringify({ username: 'testuser' }));
     render(<App />);
-    await waitFor(() => screen.getByText('Mock Dashboard Component'));
+    await waitFor(() => expect(screen.getByText('Mock Dashboard Component')).toBeInTheDocument());
 
-    const profileButton = screen.getByRole('button', {name: 'Profile'});
-    fireEvent.click(profileButton);
-    await waitFor(() => screen.getByText('Mock Profile Component'));
+    fireEvent.click(screen.getByText('Mock Profile Nav'));
+    await waitFor(() => expect(screen.getByText('Current Page: profile')).toBeInTheDocument());
     expect(screen.getByText('Mock Profile Component')).toBeInTheDocument();
-    expect(screen.getByText('Current Page: profile')).toBeInTheDocument();
   });
 
-  it('logs in successfully and updates state', async () => {
+  it('handles initial login state from localStorage when user exists', async () => {
+    localStorage.setItem('user', JSON.stringify({ username: 'existinguser' }));
     render(<App />);
-    await waitFor(() => screen.getByText('Mock Login Component'));
-    const loginButton = screen.getByRole('button', { name: 'Login' });
-    fireEvent.click(loginButton);
-
-    await waitFor(() => screen.getByText('Mock Dashboard Component'));
-    expect(screen.getByText('Mock Dashboard Component')).toBeInTheDocument();
-    expect(screen.getByText('Current Page: dashboard')).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText('Mock Dashboard Component')).toBeInTheDocument());
   });
 
-  it('logs out successfully and updates state', async () => {
-    localStorage.setItem('user', JSON.stringify({ name: 'Test User' }));
-    render(<App />);
-    await waitFor(() => screen.getByText('Mock Dashboard Component'));
-
-    const logoutButton = screen.getByRole('button', { name: 'Logout' });
-    fireEvent.click(logoutButton);
-
-    await waitFor(() => screen.getByText('Mock Login Component'));
-    expect(screen.getByText('Mock Login Component')).toBeInTheDocument();
-  });
-
-  it('navigates correctly using the Navbar', async () => {
-     localStorage.setItem('user', JSON.stringify({ name: 'Test User' }));
+  it('handles initial login state from localStorage when user is null', async () => {
+    localStorage.setItem('user', null);
      render(<App />);
-     await waitFor(() => screen.getByText('Mock Dashboard Component'));
+    await waitFor(() => expect(screen.getByText('Mock Login Component')).toBeInTheDocument());
+  });
 
-     const dashboardButton = screen.getByRole('button', { name: 'Dashboard'});
-     fireEvent.click(dashboardButton);
-     await waitFor(() => screen.getByText('Current Page: dashboard'));
-
-     expect(screen.getByText('Mock Dashboard Component')).toBeInTheDocument();
-     expect(screen.getByText('Current Page: dashboard')).toBeInTheDocument();
+   it('handles initial login state from localStorage when user is undefined', async () => {
+    localStorage.setItem('user', undefined);
+    render(<App />);
+    await waitFor(() => expect(screen.getByText('Mock Login Component')).toBeInTheDocument());
   });
 });
 
