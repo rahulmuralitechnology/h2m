@@ -3,12 +3,14 @@ import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import Navbar from './components/Navbar';
 import Profile from './components/Profile';
+import SplashScreen from './components/SplashScreen';
 import './App.css';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState('dashboard');
+  const [showSplash, setShowSplash] = useState(true);
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
@@ -16,6 +18,13 @@ function App() {
       setIsLoggedIn(true);
     }
     setLoading(false);
+
+    // Hide splash screen after 3 seconds
+    const splashTimer = setTimeout(() => {
+      setShowSplash(false);
+    }, 3000);
+
+    return () => clearTimeout(splashTimer);
   }, []);
 
   const handleLogin = () => {
@@ -32,8 +41,8 @@ function App() {
     setCurrentPage(page);
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
+  if (loading || showSplash) {
+    return <SplashScreen />;
   }
 
   return (

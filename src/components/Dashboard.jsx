@@ -54,6 +54,14 @@ function Dashboard() {
     <div className="dashboard">
       <h2>Dashboard</h2>
       <CreateOrder onOrderCreated={handleOrderCreated} />
+      {user.street && user.city && user.state && user.zipCode && (
+  <div>
+    <h3>Your Address</h3>
+    <p>
+      {user.street}, {user.city}, {user.state} {user.zipCode}
+    </p>
+  </div>
+)}
       <h3>Your Orders</h3>
       <div>
         <label>Filter by Status:</label>
@@ -64,23 +72,29 @@ function Dashboard() {
         </select>
       </div>
       <div className="order-list">
-        {filteredOrders.length === 0 ? (
-          <p>No orders placed or received yet.</p>
-        ) : (
-          filteredOrders.map((order, index) => (
-            <div className="order-card" key={index}>
-              <p>
-                {order.senderPhone === user.phone
-                  ? `To: ${order.recipientName} (${order.recipientPhone})`
-                  : `From: ${order.senderName} (${order.senderPhone})`}
-              </p>
-              <p>Status: {order.status}</p>
-              <p>Time Remaining: {order.timeRemaining} minutes</p>
-              <button onClick={() => handleCancelOrder(index)}>Cancel Order</button>
-            </div>
-          ))
-        )}
+  {filteredOrders.length === 0 ? (
+    <p>No orders placed or received yet.</p>
+  ) : (
+    filteredOrders.map((order, index) => (
+      <div className="order-card" key={index}>
+        <p>
+          {order.senderPhone === user.phone
+            ? `To: ${order.recipientName} (${order.recipientPhone})`
+            : `From: ${order.senderName} (${order.senderPhone})`}
+        </p>
+        <p>
+          <strong>Sender Address:</strong> {order.senderStreet}, {order.senderCity}, {order.senderState} {order.senderZipCode}
+        </p>
+        <p>
+          <strong>Recipient Address:</strong> {order.recipientStreet}, {order.recipientCity}, {order.recipientState} {order.recipientZipCode}
+        </p>
+        <p>Status: {order.status}</p>
+        <p>Time Remaining: {order.timeRemaining} minutes</p>
+        <button onClick={() => handleCancelOrder(index)}>Cancel Order</button>
       </div>
+    ))
+  )}
+</div>
     </div>
   );
 }

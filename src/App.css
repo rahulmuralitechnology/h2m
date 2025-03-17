@@ -246,3 +246,155 @@ form button:hover {
     padding: 12px;
   }
 }
+
+/* Profile Picture Styles */
+.profile-picture-container {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.profile-picture {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #bb86fc;
+}
+
+.profile-picture-placeholder {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background-color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #e0e0e0;
+  border: 2px solid #bb86fc;
+}
+
+.profile-picture-input {
+  margin-top: 10px;
+}
+
+/* Navbar Profile Picture Styles */
+.navbar-profile-picture {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Address Fields Styles */
+.profile input[type='text'],
+.profile input[type='tel'] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #333;
+  border-radius: 5px;
+  font-size: 14px;
+  box-sizing: border-box;
+  background-color: #333;
+  color: #e0e0e0;
+  transition: border-color 0.3s ease;
+}
+
+.profile input:focus {
+  border-color: #bb86fc;
+  outline: none;
+}
+
+/* Order Card Styles */
+.order-card {
+  background-color: #333;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  margin-bottom: 15px;
+}
+
+.order-card p {
+  margin: 5px 0;
+  color: #e0e0e0;
+}
+
+.order-card strong {
+  color: #bb86fc;
+}
+
+/* Bottom Navbar Styles */
+.bottom-navbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #1f1f1f; /* Dark navbar */
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 10px 0;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+}
+
+.bottom-navbar button {
+  background: none;
+  border: none;
+  color: #bb86fc; /* Purple accent */
+  font-size: 16px;
+  cursor: pointer;
+  transition: color 0.3s ease, transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.bottom-navbar button:hover {
+  color: #7c4dff; /* Lighter purple */
+  transform: translateY(-3px);
+}
+
+.bottom-navbar button.active {
+  color: #7c4dff; /* Highlight active button */
+}
+
+.bottom-navbar button span {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Navbar Profile Picture Styles */
+.navbar-profile-picture {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* FontAwesome Icons */
+.bottom-navbar button svg {
+  font-size: 20px;
+}
+
+.bottom-navbar button {
+  background: none;
+  border: none;
+  color: #bb86fc; /* Purple accent */
+  font-size: 16px;
+  cursor: pointer;
+  transition: color 0.3s ease, transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.bottom-navbar button:hover {
+  color: #7c4dff; /* Lighter purple */
+  transform: translateY(-3px);
+}
+
+.bottom-navbar button.active {
+  color: #7c4dff; /* Highlight active button */
+}
