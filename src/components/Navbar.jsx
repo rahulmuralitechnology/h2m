@@ -19,9 +19,9 @@ function Navbar({ isLoggedIn, onLogout, navigateTo, currentPage }) {
           <FontAwesomeIcon icon={faBars} />
         </button>
         <h1>H2M</h1>
-        <div className="search-bar">
+        {/* <div className="search-bar">
           <input type="text" placeholder="Search..." />
-        </div>
+        </div> */}
       </div>
       <div className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
