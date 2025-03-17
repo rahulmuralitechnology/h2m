@@ -398,3 +398,162 @@ form button:hover {
 .bottom-navbar button.active {
   color: #7c4dff; /* Highlight active button */
 }
+
+/* General Styles */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #121212; /* Dark background */
+  color: #e0e0e0; /* Light text */
+}
+
+.App {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  padding-bottom: 80px; /* Add padding to avoid overlap with the bottom navbar */
+}
+
+/* Top Navbar Styles */
+.top-navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #1f1f1f; /* Dark navbar */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.top-navbar .hamburger {
+  background: none;
+  border: none;
+  color: #bb86fc; /* Purple accent */
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.top-navbar h1 {
+  margin: 0;
+  font-size: 24px;
+  color: #bb86fc; /* Purple accent */
+}
+
+.top-navbar .search-bar input {
+  padding: 8px;
+  border: 1px solid #333;
+  border-radius: 5px;
+  background-color: #333;
+  color: #e0e0e0;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -250px;
+  width: 250px;
+  height: 100vh;
+  background-color: #1f1f1f; /* Dark sidebar */
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+  transition: left 0.3s ease;
+  z-index: 1000;
+}
+
+.sidebar.open {
+  left: 0;
+}
+
+.sidebar-header {
+  padding: 20px;
+  text-align: center;
+  border-bottom: 1px solid #333;
+}
+
+.sidebar-profile-picture {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+
+.sidebar-icon {
+  font-size: 40px;
+  color: #bb86fc; /* Purple accent */
+}
+
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-menu li {
+  padding: 15px 20px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.sidebar-menu li:hover {
+  background-color: #333;
+}
+
+.sidebar-menu li.active {
+  background-color: #bb86fc; /* Purple accent */
+  color: #121212; /* Dark text */
+}
+
+.sidebar-menu li span {
+  margin-left: 10px;
+}
+
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+/* Login Container Styles */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.login-form {
+  background-color: #1f1f1f; /* Dark form background */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  max-width: 400px;
+  width: 100%;
+}
+
+.login-form h2 {
+  margin-top: 0;
+  color: #bb86fc; /* Purple accent */
+}
+
+.login-form .pin-input {
+  display: flex;
+  gap: 10px;
+}
+
+.login-form .pin-input input {
+  width: 40px;
+  text-align: center;
+  padding: 10px;
+  border: 1px solid #333;
+  border-radius: 5px;
+  background-color: #333;
+  color: #e0e0e0;
+}
+
+.login-form .error {
+  color: #ff4444; /* Red for error messages */
+}

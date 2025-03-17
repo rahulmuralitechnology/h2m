@@ -47,6 +47,12 @@ function App() {
 
   return (
     <div className="App">
+      <Navbar
+        isLoggedIn={isLoggedIn}
+        onLogout={handleLogout}
+        navigateTo={navigateTo}
+        currentPage={currentPage}
+      />
       {!isLoggedIn ? (
         <Login onLogin={handleLogin} />
       ) : (
@@ -55,12 +61,7 @@ function App() {
           {currentPage === 'profile' && <Profile />}
         </>
       )}
-      <Navbar
-        isLoggedIn={isLoggedIn}
-        onLogout={handleLogout}
-        navigateTo={navigateTo}
-        currentPage={currentPage}
-      />
+      
     </div>
   );
 }

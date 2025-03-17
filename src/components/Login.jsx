@@ -64,36 +64,38 @@ function Login({ onLogin }) {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label>Phone Number:</label>
-        <input
-          type="tel"
-          value={phone}
+    <div className="login-container">
+      <form onSubmit={handleSubmit} className="login-form">
+        <h2>Login</h2>
+        <div>
+          <label>Phone Number:</label>
+          <input
+            type="tel"
+            value={phone}
           onChange={handlePhoneChange}
-          maxLength="10"
-          required
-        />
-      </div>
-      <div>
-        <label>4-Digit PIN:</label>
-        <div style={{ display: 'flex', gap: '5px' }}>
-          {pin.map((digit, index) => (
-            <input
-              key={index}
-              type="text"
-              value={digit}
-              onChange={(e) => handlePinChange(index, e.target.value)}
-              maxLength="1"
-              style={{ width: '30px', textAlign: 'center' }}
-              required
-            />
-          ))}
+            maxLength="10"
+            required
+          />
         </div>
-      </div>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <button type="submit">Login</button>
-    </form>
+        <div>
+          <label>4-Digit PIN:</label>
+          <div className="pin-input">
+            {pin.map((digit, index) => (
+              <input
+                key={index}
+                type="text"
+                value={digit}
+                onChange={(e) => handlePinChange(index, e.target.value)}
+                maxLength="1"
+                required
+              />
+            ))}
+          </div>
+        </div>
+        {error && <p className="error">{error}</p>}
+        <button type="submit">Login</button>
+      </form>
+    </div>
   );
 }
 
