@@ -1,20 +1,62 @@
 .splash-screen {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: #121212; /* Dark background */
-    color: #bb86fc; /* Purple accent */
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  text-align: center;
+}
+
+.splash-screen img {
+  max-width: 100%;
+  height: auto;
+}
+
+.splash-screen h1 {
+  font-size: 2.5rem;
+  margin: 20px 0;
+}
+
+.splash-screen p {
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.progress-bar {
+  width: 50%;
+  height: 8px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 20px;
+}
+
+.progress {
+  height: 100%;
+  background-color: #09f;
+  transition: width 0.3s ease;
+}
+
+.fade-out {
+  animation: fadeOut 1s ease-in-out forwards;
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
   }
-  
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@media (max-width: 768px) {
   .splash-screen h1 {
-    font-size: 2.5rem;
-    margin-bottom: 20px;
+    font-size: 2rem;
   }
-  
+
   .splash-screen p {
-    font-size: 1.2rem;
-    color: #e0e0e0; /* Light text */
+    font-size: 1rem;
   }
+}
